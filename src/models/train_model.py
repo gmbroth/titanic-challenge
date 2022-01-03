@@ -1,0 +1,53 @@
+
+from sklearn.compose import ColumnTransformer
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
+from sklearn.impute import SimpleImputer, KNNImputer
+from sklearn.preprocessing import RobustScaler, OneHotEncoder
+
+class TrainModel():
+
+	@classmethod
+	def transformerFor(cls, cat_cols, num_cols):
+		"""Construct a column transformer for the named columns
+		
+		Args:
+		    cat_cols (List): Categorical column names
+		    num_cols (List): Numerical column names
+		
+		Returns:
+		    ColumnTransformer: a column transformer
+		"""
+		# Categorical column transformer
+		cat_transformer = Pipeline(steps=[
+		    ('imputer', SimpleImputer(strategy='most_frequent')),
+		    ('onehot', OneHotEncoder(handle_unknown='ignore', sparse=False)),
+		    ('pca', PCA(n_components=10))
+		])
+
+		# Numerical column transformer
+		num_transformer = Pipeline(steps=[
+		    ('imputer', KNNImputer(n_neighbors=5)),
+		    ('scaler', RobustScaler())
+		])
+
+		return ColumnTransformer(
+		    transformers=[
+		        ('num', num_transformer, num_cols),
+		        ('cat', cat_transformer, cat_cols)
+		    ])		
+		
+
+	@classmethod
+	def pipelineFor(cls, preprocessor, classifier):
+		"""Construct a pipeline for the specified preprocessor and classifier
+		
+		Args:
+		    preprocessor (ColumnTransformer): A column transformer
+		    classifier (Classifier): A model classifier
+		
+		Returns:
+		    Pipeline: A Pipeline suitable for classification use
+		"""
+		return Pipeline(steps=[('preprocessor', preprocessor),
+                      ('classifier', classifier)])
