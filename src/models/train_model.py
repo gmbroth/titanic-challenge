@@ -51,3 +51,25 @@ class TrainModel():
 		"""
 		return Pipeline(steps=[('preprocessor', preprocessor),
                       ('classifier', classifier)])
+
+
+	@classmethod
+	def tunedParameters(cls):
+		"""Define search parameters
+		
+		Returns:
+		    Dictionary: A dictionary of key-value search parameters
+		"""
+		num_transformer_dist = {'preprocessor__num__imputer__n_neighbors': list(range(2, 15)),
+		                        'preprocessor__num__imputer__add_indicator': [True, False]}
+
+		cat_transformer_dist = {'preprocessor__cat__imputer__strategy': ['most_frequent', 'constant'],
+		                        'preprocessor__cat__imputer__add_indicator': [True, False],
+		                        'preprocessor__cat__pca__n_components': list(range(2, 15))}
+
+		random_forest_dist = {'classifier__n_estimators': list(range(50, 500)),
+		                      'classifier__max_depth': list(range(2, 20)),
+		                      'classifier__bootstrap': [True, False]}
+
+		return {**num_transformer_dist, **cat_transformer_dist, **random_forest_dist}
+

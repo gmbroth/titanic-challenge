@@ -1,5 +1,5 @@
 
-import numpy as np
+# import numpy as np
 import pandas as pd
 
 from sklearn.model_selection import train_test_split
@@ -11,12 +11,14 @@ class BuildFeatures():
 
 
     def engineerFeatures(self):
-        """Summary
+        """Engineer features of the configured data
         
         Returns:
-            TYPE: Description
+            Tuple: The engineered features
         """
-        # The feature engineering performed below is nicked from https://jaketae.github.io/study/sklearn-pipeline/
+
+        # The feature engineering performed in this method is nicked from the incredibly
+        # useful (and lucid) https://jaketae.github.io/study/sklearn-pipeline/
 
         # Columns being dropped because they're probably not predictive:
         #   boat - Lifeboat (if survived)
