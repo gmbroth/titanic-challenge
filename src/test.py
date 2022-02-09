@@ -7,6 +7,8 @@ from features.build_features import BuildFeatures
 from models.train_model import TrainModel
 from visualization.visualize import Plot
 import numpy as np
+import pandas as pd
+
 
 class Test(unittest.TestCase):
 
@@ -17,10 +19,18 @@ class Test(unittest.TestCase):
 
 	@unittest.skipIf(False, "Skip test_classifier")
 	def test_classifier(self):
-		X, y = MakeDataset.load_data();
-		self.assertTrue(not (X.empty or y.empty), f'expected data, found none')
+		"""      
+		Please see https://jaketae.github.io/study/sklearn-pipeline/ on which my 
+		implementation is based.
+		"""
+		X, y = MakeDataset.load_training_data();
+		self.assertTrue(not (X.empty or y.empty), f'expected training data, found none')
 
-		X_train, X_test, y_train, y_test = BuildFeatures(X, y).engineerFeatures();
+		test = MakeDataset.load_testing_data();
+		self.assertTrue(not test.empty and test.shape[0] == 418, f'expected valid testing data')
+
+		features = BuildFeatures(X, y, test)
+		X_train, X_test, y_train, y_test, test = features.engineer();
 		self.assertTrue(not (X_train.empty or X_test.empty or y_train.empty or y_test.empty), 
 			f'missing expected data')
 
@@ -41,14 +51,24 @@ class Test(unittest.TestCase):
 
 		random_search.fit(X_train, y_train)
 		y_pred = random_search.predict(X_test)
+
 		print(f'cross_val_score = {cross_val_score(pipeline, X_train, y_train, cv=5, scoring="accuracy").mean()}\n')
 		print(f'optimized score = {random_search.best_score_}\n')
-		# print(f'optimized parameters = {random_search.best_params_}\n')
-
 		print(f'predictions = {y_pred[:5]} versus test =\n{y_test[:5]}\n')
 		print(f'Classification report:\n{classification_report(y_test, y_pred)}\n')
 
 		Plot.plot_confusion_matrix(random_search, X_test, y_test)
+
+		# Let's make our predictions on Kaggle's submission test data ...
+		Y_pred = random_search.predict(test.drop(['passengerid',], axis=1, inplace=False, errors='ignore'))
+
+		# ... and write the results to file in the prescribed format.
+		submission = pd.DataFrame({
+		        "PassengerId": test['passengerid'],
+		        "Survived":    Y_pred
+		    })
+		self.assertTrue(submission.shape[0] == 418, f'expected 418 rows, instead found {submission.shape[0]}')
+		submission.to_csv('../models/submission.csv', index=False)
 
 
 if __name__ == '__main__':

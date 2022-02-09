@@ -10,6 +10,9 @@ class TrainModel():
 	@classmethod
 	def transformerFor(cls, cat_cols, num_cols):
 		"""Construct a column transformer for the named columns
+
+		Please see https://jaketae.github.io/study/sklearn-pipeline/ on 
+		which this implementation is based.
 		
 		Args:
 		    cat_cols (List): Categorical column names
