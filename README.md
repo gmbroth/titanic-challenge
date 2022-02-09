@@ -1,4 +1,4 @@
-kaggle
+Kaggle's Titanic challenge
 ==============================
 
 Titanic - Machine Learning from Disaster
