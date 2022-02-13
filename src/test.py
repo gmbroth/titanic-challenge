@@ -1,17 +1,20 @@
+import logging
+import numpy as np
 import os
+import pandas as pd
+import sys
 import unittest
+
 from data.make_dataset import MakeDataset
+from features.build_features import BuildFeatures
+from logging.config import fileConfig
+from models.train_model import TrainModel
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split, cross_val_score, RandomizedSearchCV
-from features.build_features import BuildFeatures
-from models.train_model import TrainModel
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import train_test_split
 from visualization.visualize import Plot
-import numpy as np
-import pandas as pd
-import logging
-from logging.config import fileConfig
-import sys
 
 
 class Test(unittest.TestCase):
