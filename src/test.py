@@ -1,13 +1,20 @@
+import logging
+import numpy as np
+import os
+import pandas as pd
+import sys
 import unittest
+
 from data.make_dataset import MakeDataset
+from features.build_features import BuildFeatures
+from logging.config import fileConfig
+from models.train_model import TrainModel
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
-from sklearn.model_selection import train_test_split, cross_val_score, RandomizedSearchCV
-from features.build_features import BuildFeatures
-from models.train_model import TrainModel
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import cross_val_score
+from sklearn.model_selection import train_test_split
 from visualization.visualize import Plot
-import numpy as np
-import pandas as pd
 
 
 class Test(unittest.TestCase):
@@ -19,6 +26,7 @@ class Test(unittest.TestCase):
 
 	@unittest.skipIf(False, "Skip test_classifier")
 	def test_classifier(self):
+		log = logging.getLogger()
 		"""      
 		Please see https://jaketae.github.io/study/sklearn-pipeline/ on which my 
 		implementation is based.
@@ -52,17 +60,16 @@ class Test(unittest.TestCase):
 		random_search.fit(X_train, y_train)
 		y_pred = random_search.predict(X_test)
 
-		print(f'cross_val_score = {cross_val_score(pipeline, X_train, y_train, cv=5, scoring="accuracy").mean()}\n')
-		print(f'optimized score = {random_search.best_score_}\n')
-		print(f'predictions = {y_pred[:5]} versus test =\n{y_test[:5]}\n')
-		print(f'Classification report:\n{classification_report(y_test, y_pred)}\n')
+		log.info(f'cross_val_score = {cross_val_score(pipeline, X_train, y_train, cv=5, scoring="accuracy").mean()}\n')
+		log.info(f'optimized score = {random_search.best_score_}\n')
+		log.info(f'predictions = {y_pred[:5]} versus test =\n{y_test[:5]}\n')
+		log.info(f'Classification report:\n{classification_report(y_test, y_pred)}\n')
+		if log.isEnabledFor(logging.INFO):
+			Plot.plot_confusion_matrix(random_search, X_test, y_test)
 
-		Plot.plot_confusion_matrix(random_search, X_test, y_test)
-
-		# Let's make our predictions on Kaggle's submission test data ...
+		# Let's make a prediction on Kaggle's submission test data ...
 		Y_pred = random_search.predict(test.drop(['passengerid',], axis=1, inplace=False, errors='ignore'))
-
-		# ... and write the results to file in the prescribed format.
+		# ... and write the results to file in the prescribed format:
 		submission = pd.DataFrame({
 		        "PassengerId": test['passengerid'],
 		        "Survived":    Y_pred
@@ -72,5 +79,10 @@ class Test(unittest.TestCase):
 
 
 if __name__ == '__main__':
-	print(f'main')
-	unittest.main()
+	fileConfig('../logging_config.ini')
+	try:
+	    sys.exit(unittest.main())
+	except Exception:
+	    logging.exception("Exception in unittest.main(): ")
+	    sys.exit(1)
+

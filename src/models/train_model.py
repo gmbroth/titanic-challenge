@@ -1,9 +1,10 @@
-
 from sklearn.compose import ColumnTransformer
-from sklearn.pipeline import Pipeline
 from sklearn.decomposition import PCA
-from sklearn.impute import SimpleImputer, KNNImputer
-from sklearn.preprocessing import RobustScaler, OneHotEncoder
+from sklearn.impute import KNNImputer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder
+from sklearn.preprocessing import RobustScaler
 
 class TrainModel():
 
